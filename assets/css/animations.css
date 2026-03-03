@@ -1,0 +1,210 @@
+/* animations.css - VTA ICT L5 Community
+   Animated network architecture background with moving red dots and connecting lines.
+   Subtle, professional, programming environment feel.
+   All animations use transform/opacity/background-position only.
+*/
+
+/* ===== BASE BODY SETUP ===== */
+body {
+  position: relative;
+  isolation: isolate;           /* stacking context: body background → negative z‑index → content */
+}
+
+/* ===== BACKGROUND LAYER 1: NETWORK GRAPH (DOTS + LINES) ===== */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;          /* no interaction */
+  z-index: -1;                   /* behind content, above body background */
+
+  /* Lines: 7 subtle red strokes connecting the nodes */
+  /* Each line is a linear‑gradient oriented along the vector, 1px thick */
+  background-image:
+    /* A–B */
+    linear-gradient(36.9deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
+    /* B–C */
+    linear-gradient(-38.7deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
+    /* C–D */
+    linear-gradient(69.4deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
+    /* D–E */
+    linear-gradient(156.8deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
+    /* E–A */
+    linear-gradient(-116.6deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
+    /* A–C */
+    linear-gradient(-6.3deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
+    /* B–D */
+    linear-gradient(26.6deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
+
+    /* Dots: 5 soft red radial gradients (nodes) */
+    /* A */
+    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
+    /* B */
+    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
+    /* C */
+    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
+    /* D */
+    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
+    /* E */
+    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%);
+
+  /* background‑size: line length 1px, dot size 6px */
+  background-size:
+    25% 1px,    /* A–B */
+    32% 1px,    /* B–C */
+    42.7% 1px,  /* C–D */
+    38.1% 1px,  /* D–E */
+    55.9% 1px,  /* E–A */
+    45.3% 1px,  /* A–C */
+    44.7% 1px,  /* B–D */
+    6px 6px,    /* dot A */
+    6px 6px,    /* dot B */
+    6px 6px,    /* dot C */
+    6px 6px,    /* dot D */
+    6px 6px;    /* dot E */
+
+  /* background‑position: line midpoints, dot positions */
+  background-position:
+    25% 32.5%,   /* A–B midpoint */
+    47.5% 30%,   /* B–C midpoint */
+    67.5% 40%,   /* C–D midpoint */
+    57.5% 67.5%, /* D–E midpoint */
+    27.5% 50%,   /* E–A midpoint */
+    37.5% 22.5%, /* A–C midpoint */
+    55% 50%,     /* B–D midpoint */
+    15% 25%,     /* dot A */
+    35% 40%,     /* dot B */
+    60% 20%,     /* dot C */
+    75% 60%,     /* dot D */
+    40% 75%;     /* dot E */
+
+  background-repeat: no-repeat;  /* each layer appears only once */
+
+  /* slow, elegant drift of the entire network */
+  animation: driftNetwork 32s ease-in-out infinite;
+}
+
+/* ===== BACKGROUND LAYER 2: ADDITIONAL DIGITAL AMBIENCE (GLOW + FAINT SCAN) ===== */
+body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;                   /* sits between network layer and content */
+
+  /* two soft glows + an extremely subtle horizontal scan */
+  background-image:
+    /* glow spot 1 */
+    radial-gradient(circle at 30% 40%, rgba(155, 28, 49, 0.05) 0%, transparent 60%),
+    /* glow spot 2 */
+    radial-gradient(circle at 80% 70%, rgba(155, 28, 49, 0.04) 0%, transparent 60%),
+    /* scanning lines (hardly visible) */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 25px,
+      rgba(255, 255, 255, 0.01) 25px,
+      rgba(255, 255, 255, 0.01) 26px,
+      transparent 26px,
+      transparent 50px
+    );
+
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: 900px 900px, 700px 700px, auto;
+  background-position: 30% 40%, 80% 70%, 0 0;
+
+  /* separate slower animation for the ambient layer */
+  animation: driftAmbient 40s linear infinite;
+}
+
+/* ===== KEYFRAMES ===== */
+
+/* Drift for network graph: all background‑positions shift slightly */
+@keyframes driftNetwork {
+  0% {
+    background-position:
+      25% 32.5%, 47.5% 30%, 67.5% 40%, 57.5% 67.5%, 27.5% 50%, 37.5% 22.5%, 55% 50%,
+      15% 25%, 35% 40%, 60% 20%, 75% 60%, 40% 75%;
+  }
+  50% {
+    background-position:
+      27% 34%, 49% 32%, 69% 42%, 59% 69%, 29% 52%, 39% 24%, 57% 52%,
+      17% 27%, 37% 42%, 62% 22%, 77% 62%, 42% 77%;
+  }
+  100% {
+    background-position:
+      25% 32.5%, 47.5% 30%, 67.5% 40%, 57.5% 67.5%, 27.5% 50%, 37.5% 22.5%, 55% 50%,
+      15% 25%, 35% 40%, 60% 20%, 75% 60%, 40% 75%;
+  }
+}
+
+/* Drift for ambient glows + scan */
+@keyframes driftAmbient {
+  0% {
+    background-position: 30% 40%, 80% 70%, 0 0;
+  }
+  33% {
+    background-position: 32% 42%, 77% 68%, 0 12px;
+  }
+  66% {
+    background-position: 28% 38%, 83% 72%, 0 24px;
+  }
+  100% {
+    background-position: 30% 40%, 80% 70%, 0 0;
+  }
+}
+
+/* ===== MICRO‑INTERACTIONS ===== */
+/* Buttons – soft red glow */
+button:hover,
+.btn:hover,
+[class*="btn"]:hover {
+  box-shadow: 0 0 12px rgba(155, 28, 49, 0.5);
+  transition: box-shadow 0.2s ease;
+}
+
+/* Cards – gentle lift */
+.card:hover {
+  transform: translateY(-4px);
+  transition: transform 0.2s ease;
+}
+
+/* Navigation links – animated red underline */
+.nav-link,
+nav a {
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-link::after,
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #9B1C31;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.nav-link:hover::after,
+nav a:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Base transition for interactive elements */
+button,
+.btn,
+.card,
+.nav-link,
+nav a {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
