@@ -1,130 +1,144 @@
-/* ===== TRANSITION UTILITIES ===== */
-.transition {
-  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+/* assets/css/animations.css */
+
+/* ------------------------------
+   Background Layers (body pseudo)
+------------------------------ */
+
+/* Main animated gradient background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    #0a0000 0%,
+    #1a0505 20%,
+    #2f0a0a 40%,
+    #5e121e 60%,
+    #9b1c31 80%,
+    #0f0000 100%
+  );
+  background-size: 300% 300%;
+  animation: moveGradient 22s ease-in-out infinite alternate;
+  will-change: background-position;
 }
 
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Soft radial glow & light movement overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: radial-gradient(
+    circle at 30% 40%,
+    rgba(155, 28, 49, 0.25) 0%,
+    transparent 50%
+  ), radial-gradient(
+    circle at 70% 60%,
+    rgba(155, 28, 49, 0.15) 0%,
+    transparent 60%
+  );
+  background-size: 200% 200%, 250% 250%;
+  background-blend-mode: overlay;
+  animation: moveGlow 24s ease-in-out infinite alternate;
+  will-change: background-position;
 }
 
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* ===== REVEAL ANIMATIONS (SCROLL) ===== */
-.fade-in,
-.fade-in-up,
-.fade-in-left,
-.fade-in-right {
-  opacity: 0;
-  transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
-              transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-  will-change: opacity, transform;
-}
-
-.fade-in.active {
-  opacity: 1;
-  transform: none;
-}
-
-.fade-in-up {
-  transform: translateY(30px);
-}
-
-.fade-in-up.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.fade-in-left {
-  transform: translateX(-30px);
-}
-
-.fade-in-left.active {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.fade-in-right {
-  transform: translateX(30px);
-}
-
-.fade-in-right.active {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* ===== SECTION REVEAL UTILITY ===== */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
-              transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ===== HERO ENTRANCE ===== */
-.hero {
-  animation: heroFadeUp 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-}
-
-@keyframes heroFadeUp {
+/* Keyframes for main gradient movement */
+@keyframes moveGradient {
   0% {
-    opacity: 0;
-    transform: translateY(20px);
+    background-position: 0% 0%;
   }
   100% {
-    opacity: 1;
-    transform: translateY(0);
+    background-position: 100% 100%;
   }
 }
 
-/* ===== CARD HOVER ===== */
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Keyframes for radial glow movement */
+@keyframes moveGlow {
+  0% {
+    background-position: 0% 0%, 100% 100%;
+  }
+  50% {
+    background-position: 50% 50%, 20% 80%;
+  }
+  100% {
+    background-position: 100% 100%, 0% 0%;
+  }
 }
 
-/* ===== BUTTON HOVER ===== */
-.btn:hover {
+/* ------------------------------
+   Micro‑interactions (hover)
+------------------------------ */
+
+/* Card hover: subtle scale and glow */
+.card:hover,
+article:hover,
+[class*="card"]:hover {
   transform: scale(1.02);
-  box-shadow: 0 0 15px rgba(155, 28, 49, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 24px -8px rgba(155, 28, 49, 0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.btn-primary:hover {
-  box-shadow: 0 0 20px rgba(155, 28, 49, 0.5);
+/* Button hover: soft glow */
+button:hover,
+.btn:hover,
+[class*="btn"]:hover,
+[class*="button"]:hover {
+  box-shadow: 0 0 18px rgba(155, 28, 49, 0.4);
+  transition: box-shadow 0.2s ease;
 }
 
-/* ===== NAV LINK UNDERLINE ===== */
-.nav-links a {
+/* Navbar link shimmer underline */
+nav a,
+.navbar a,
+.nav-link {
   position: relative;
-  text-decoration: none;
+  text-decoration: none; /* in case style.css adds underline */
 }
 
-.nav-links a::after {
+nav a::after,
+.navbar a::after,
+.nav-link::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: -2px;
   left: 0;
-  width: 0;
-  height: 2px;
-  background-color: var(--primary-color);
-  transition: width 0.3s ease;
-}
-
-.nav-links a:hover::after {
   width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #9b1c31, transparent);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  transition: background-position 0.4s ease;
+  opacity: 0.7;
 }
 
-/* ===== ADDITIONAL MICRO-INTERACTIONS ===== */
-.navbar,
-.footer {
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+nav a:hover::after,
+.navbar a:hover::after,
+.nav-link:hover::after {
+  background-position: -100% 0;
 }
+
+/* Ensure smooth transitions on all interactive elements */
+.card,
+article,
+[class*="card"],
+button,
+.btn,
+[class*="btn"],
+[class*="button"],
+nav a,
+.navbar a,
+.nav-link {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+/* Prevent any layout shifts – keep transforms and opacity only */
