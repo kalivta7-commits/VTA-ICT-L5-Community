@@ -1,144 +1,205 @@
-/* assets/css/animations.css */
+/* ========================================
+   animations.css
+   VTA ICT L5 Community
+   Creative ICT / programming style animated background
+   Subtle micro-interactions
+   ======================================== */
 
-/* ------------------------------
-   Background Layers (body pseudo)
------------------------------- */
-
-/* Main animated gradient background */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  background: linear-gradient(
-    135deg,
-    #0a0000 0%,
-    #1a0505 20%,
-    #2f0a0a 40%,
-    #5e121e 60%,
-    #9b1c31 80%,
-    #0f0000 100%
-  );
-  background-size: 300% 300%;
-  animation: moveGradient 22s ease-in-out infinite alternate;
-  will-change: background-position;
-}
-
-/* Soft radial glow & light movement overlay */
+/* ----------------------------------------
+   Base setup for background layers
+   Fixed positioning, behind all content
+---------------------------------------- */
+body::before,
 body::after {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  background: radial-gradient(
-    circle at 30% 40%,
-    rgba(155, 28, 49, 0.25) 0%,
-    transparent 50%
-  ), radial-gradient(
-    circle at 70% 60%,
-    rgba(155, 28, 49, 0.15) 0%,
-    transparent 60%
-  );
-  background-size: 200% 200%, 250% 250%;
-  background-blend-mode: overlay;
-  animation: moveGlow 24s ease-in-out infinite alternate;
-  will-change: background-position;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;   /* let clicks pass through */
+  z-index: -1;             /* stay behind all content */
+  will-change: transform, background-position; /* performance hint */
 }
 
-/* Keyframes for main gradient movement */
-@keyframes moveGradient {
+/* ----------------------------------------
+   Layer 1: Digital grid (static with subtle drift)
+   Deep navy base is assumed from theme – we only add red grid lines
+---------------------------------------- */
+body::before {
+  /* Vertical lines – 1px red, 40px spacing */
+  background-image: 
+    repeating-linear-gradient(
+      to right,
+      rgba(155, 28, 49, 0.12) 0px,
+      rgba(155, 28, 49, 0.12) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    /* Horizontal lines – same styling */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(155, 28, 49, 0.12) 0px,
+      rgba(155, 28, 49, 0.12) 1px,
+      transparent 1px,
+      transparent 40px
+    );
+
+  /* Initial position */
+  background-position: 0 0, 0 0;
+
+  /* No repeat needed – the gradients already repeat */
+  background-repeat: no-repeat;
+
+  /* Slow, subtle drift animation (30s cycle) */
+  animation: gridDrift 30s linear infinite alternate;
+}
+
+@keyframes gridDrift {
   0% {
-    background-position: 0% 0%;
+    background-position: 0 0, 0 0;
   }
   100% {
-    background-position: 100% 100%;
+    /* Move a few pixels diagonally – almost imperceptible */
+    background-position: 8px 4px, 4px 8px;
   }
 }
 
-/* Keyframes for radial glow movement */
-@keyframes moveGlow {
+/* ----------------------------------------
+   Layer 2: Moving radial glow + scanning line
+   Combined in one pseudo-element for performance
+   Scanning line (top layer) + radial glow (bottom layer)
+---------------------------------------- */
+body::after {
+  /* Two backgrounds: scanning line first (appears on top), radial glow second */
+  background-image: 
+    /* Scanning line – soft red horizontal bar */
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(155, 28, 49, 0.2) 45%,
+      rgba(155, 28, 49, 0.5) 50%,
+      rgba(155, 28, 49, 0.2) 55%,
+      transparent
+    ),
+    /* Radial glow – large soft spot */
+    radial-gradient(
+      circle at center,
+      rgba(155, 28, 49, 0.25) 0%,
+      transparent 70%
+    );
+
+  /* Sizing: scanning line is 4px tall, radial glow is oversized to allow movement */
+  background-size:
+    100% 4px,        /* scanning line – thin */
+    200% 200%;       /* radial glow – large, so we can shift it */
+
+  /* Initial positions:
+     - scanning line starts just above the viewport (invisible)
+     - radial glow starts at some offset
+  */
+  background-position:
+    0% -4px,         /* scanning line off-screen top */
+    30% 40%;         /* radial glow offset */
+
+  background-repeat: no-repeat, repeat; /* radial glow repeats to fill, but with size 200% it tiles softly – we want no repeat? actually we want one big glow, so repeat should be no-repeat. */
+  /* Correction: radial glow should not repeat */
+  background-repeat: no-repeat, no-repeat;
+
+  /* Single animation drives both layers with different paths */
+  animation: scanAndGlow 25s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+@keyframes scanAndGlow {
+  /* Scanning line moves from top to bottom, radial glow wanders */
   0% {
-    background-position: 0% 0%, 100% 100%;
+    background-position: 0% -4px, 20% 30%;
+  }
+  25% {
+    background-position: 0% 25%, 40% 50%;
   }
   50% {
-    background-position: 50% 50%, 20% 80%;
+    background-position: 0% 50%, 60% 30%;
+  }
+  75% {
+    background-position: 0% 75%, 30% 70%;
   }
   100% {
-    background-position: 100% 100%, 0% 0%;
+    background-position: 0% 100%, 70% 60%;
   }
 }
 
-/* ------------------------------
-   Micro‑interactions (hover)
------------------------------- */
+/* ----------------------------------------
+   Subtle micro‑interactions
+   Glow on buttons, lift on cards, shimmer on nav links
+   No layout overrides, only visual effects on hover
+---------------------------------------- */
 
-/* Card hover: subtle scale and glow */
-.card:hover,
-article:hover,
-[class*="card"]:hover {
-  transform: scale(1.02);
-  box-shadow: 0 12px 24px -8px rgba(155, 28, 49, 0.25);
+/* Buttons / .btn – soft red glow */
+button,
+.btn,
+[role="button"] {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+button:hover,
+.btn:hover,
+[role="button"]:hover {
+  box-shadow: 0 0 8px rgba(155, 28, 49, 0.4);
+  /* No transform lift – only glow, to keep it subtle */
+}
+
+/* Cards – soft lift and slight border glow */
+.card,
+.card-like {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Button hover: soft glow */
-button:hover,
-.btn:hover,
-[class*="btn"]:hover,
-[class*="button"]:hover {
-  box-shadow: 0 0 18px rgba(155, 28, 49, 0.4);
-  transition: box-shadow 0.2s ease;
+.card:hover,
+.card-like:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(155, 28, 49, 0.2);
 }
 
-/* Navbar link shimmer underline */
+/* Navigation links – underline shimmer effect */
 nav a,
-.navbar a,
-.nav-link {
+.nav-link,
+.navbar a {
   position: relative;
-  text-decoration: none; /* in case style.css adds underline */
+  text-decoration: none; /* we'll add our own underline */
 }
 
 nav a::after,
-.navbar a::after,
-.nav-link::after {
+.nav-link::after,
+.navbar a::after {
   content: '';
   position: absolute;
   bottom: -2px;
   left: 0;
   width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #9b1c31, transparent);
-  background-size: 200% 100%;
-  background-position: 100% 0;
-  transition: background-position 0.4s ease;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #9B1C31, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
   opacity: 0.7;
 }
 
 nav a:hover::after,
-.navbar a:hover::after,
-.nav-link:hover::after {
-  background-position: -100% 0;
+.nav-link:hover::after,
+.navbar a:hover::after {
+  transform: scaleX(1);
 }
 
-/* Ensure smooth transitions on all interactive elements */
-.card,
-article,
-[class*="card"],
-button,
-.btn,
-[class*="btn"],
-[class*="button"],
-nav a,
-.navbar a,
-.nav-link {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.3s ease;
-  will-change: transform, box-shadow;
+/* Optional: add a very subtle text glow to nav links on hover */
+nav a:hover,
+.nav-link:hover,
+.navbar a:hover {
+  text-shadow: 0 0 4px rgba(155, 28, 49, 0.3);
 }
 
-/* Prevent any layout shifts – keep transforms and opacity only */
+/* ----------------------------------------
+   Performance & readability
+   All animations use transform/opacity/background-position only
+   No heavy box‑shadows or repaint‑intensive effects
+---------------------------------------- */
