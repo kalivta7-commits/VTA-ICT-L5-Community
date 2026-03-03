@@ -37,4 +37,36 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  // ===== Scroll Reveal Animation =====
+  const revealElements = document.querySelectorAll(
+    '.fade-in, .fade-in-up, .fade-in-left, .fade-in-right, .reveal'
+  );
+
+  if (!revealElements.length) {
+    return;
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    revealElements.forEach(element => element.classList.add('active'));
+    return;
+  }
+
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      root: null,
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    }
+  );
+
+  revealElements.forEach(element => revealObserver.observe(element));
 });
