@@ -1,93 +1,16 @@
-/* animations.css - VTA ICT L5 Community
-   Animated network architecture background with moving red dots and connecting lines.
-   Subtle, professional, programming environment feel.
-   All animations use transform/opacity/background-position only.
-*/
+/* animations.css - Professional ICT background and micro-interactions */
 
-/* ===== BASE BODY SETUP ===== */
+/* ---------- Base setup ---------- */
 body {
   position: relative;
-  isolation: isolate;           /* stacking context: body background → negative z‑index → content */
+  background-color: #0a0c10; /* deep, dark base for contrast */
+  min-height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
 }
 
-/* ===== BACKGROUND LAYER 1: NETWORK GRAPH (DOTS + LINES) ===== */
-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;          /* no interaction */
-  z-index: -1;                   /* behind content, above body background */
-
-  /* Lines: 7 subtle red strokes connecting the nodes */
-  /* Each line is a linear‑gradient oriented along the vector, 1px thick */
-  background-image:
-    /* A–B */
-    linear-gradient(36.9deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
-    /* B–C */
-    linear-gradient(-38.7deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
-    /* C–D */
-    linear-gradient(69.4deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
-    /* D–E */
-    linear-gradient(156.8deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
-    /* E–A */
-    linear-gradient(-116.6deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
-    /* A–C */
-    linear-gradient(-6.3deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
-    /* B–D */
-    linear-gradient(26.6deg, rgba(155, 28, 49, 0.15), rgba(155, 28, 49, 0.15)),
-
-    /* Dots: 5 soft red radial gradients (nodes) */
-    /* A */
-    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
-    /* B */
-    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
-    /* C */
-    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
-    /* D */
-    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%),
-    /* E */
-    radial-gradient(circle at 50% 50%, rgba(155, 28, 49, 0.3) 0%, transparent 70%);
-
-  /* background‑size: line length 1px, dot size 6px */
-  background-size:
-    25% 1px,    /* A–B */
-    32% 1px,    /* B–C */
-    42.7% 1px,  /* C–D */
-    38.1% 1px,  /* D–E */
-    55.9% 1px,  /* E–A */
-    45.3% 1px,  /* A–C */
-    44.7% 1px,  /* B–D */
-    6px 6px,    /* dot A */
-    6px 6px,    /* dot B */
-    6px 6px,    /* dot C */
-    6px 6px,    /* dot D */
-    6px 6px;    /* dot E */
-
-  /* background‑position: line midpoints, dot positions */
-  background-position:
-    25% 32.5%,   /* A–B midpoint */
-    47.5% 30%,   /* B–C midpoint */
-    67.5% 40%,   /* C–D midpoint */
-    57.5% 67.5%, /* D–E midpoint */
-    27.5% 50%,   /* E–A midpoint */
-    37.5% 22.5%, /* A–C midpoint */
-    55% 50%,     /* B–D midpoint */
-    15% 25%,     /* dot A */
-    35% 40%,     /* dot B */
-    60% 20%,     /* dot C */
-    75% 60%,     /* dot D */
-    40% 75%;     /* dot E */
-
-  background-repeat: no-repeat;  /* each layer appears only once */
-
-  /* slow, elegant drift of the entire network */
-  animation: driftNetwork 32s ease-in-out infinite;
-}
-
-/* ===== BACKGROUND LAYER 2: ADDITIONAL DIGITAL AMBIENCE (GLOW + FAINT SCAN) ===== */
+/* Background layers – all behind content */
+body::before,
 body::after {
   content: '';
   position: absolute;
@@ -96,115 +19,151 @@ body::after {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: -1;                   /* sits between network layer and content */
-
-  /* two soft glows + an extremely subtle horizontal scan */
-  background-image:
-    /* glow spot 1 */
-    radial-gradient(circle at 30% 40%, rgba(155, 28, 49, 0.05) 0%, transparent 60%),
-    /* glow spot 2 */
-    radial-gradient(circle at 80% 70%, rgba(155, 28, 49, 0.04) 0%, transparent 60%),
-    /* scanning lines (hardly visible) */
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 25px,
-      rgba(255, 255, 255, 0.01) 25px,
-      rgba(255, 255, 255, 0.01) 26px,
-      transparent 26px,
-      transparent 50px
-    );
-
-  background-repeat: no-repeat, no-repeat, repeat;
-  background-size: 900px 900px, 700px 700px, auto;
-  background-position: 30% 40%, 80% 70%, 0 0;
-
-  /* separate slower animation for the ambient layer */
-  animation: driftAmbient 40s linear infinite;
+  z-index: -1;
 }
 
-/* ===== KEYFRAMES ===== */
+/* ---------- Layer 1: digital grid + moving glow ---------- */
+body::before {
+  /* Grid: very fine lines using brand color at low opacity */
+  background-image:
+    /* horizontal grid lines */
+    linear-gradient(rgba(155, 28, 49, 0.025) 1px, transparent 1px),
+    /* vertical grid lines */
+    linear-gradient(90deg, rgba(155, 28, 49, 0.025) 1px, transparent 1px),
+    /* radial glow – soft, moving */
+    radial-gradient(circle at 30% 40%, rgba(155, 28, 49, 0.1) 0%, transparent 60%);
 
-/* Drift for network graph: all background‑positions shift slightly */
-@keyframes driftNetwork {
+  background-size:
+    60px 60px,   /* grid cell size */
+    60px 60px,
+    100% 100%;   /* glow covers whole area, movement via position */
+
+  background-position:
+    0 0,
+    0 0,
+    0 0;
+
+  /* Single animation controls both grid shift and glow drift */
+  animation: gridAndGlow 40s linear infinite;
+}
+
+@keyframes gridAndGlow {
   0% {
     background-position:
-      25% 32.5%, 47.5% 30%, 67.5% 40%, 57.5% 67.5%, 27.5% 50%, 37.5% 22.5%, 55% 50%,
-      15% 25%, 35% 40%, 60% 20%, 75% 60%, 40% 75%;
+      0 0,                /* grid starts */
+      0 0,
+      0% 0%;              /* glow starts at top-left */
+  }
+  25% {
+    background-position:
+      15px 15px,          /* grid moves diagonally */
+      15px 15px,
+      20% 30%;            /* glow drifts */
   }
   50% {
     background-position:
-      27% 34%, 49% 32%, 69% 42%, 59% 69%, 29% 52%, 39% 24%, 57% 52%,
-      17% 27%, 37% 42%, 62% 22%, 77% 62%, 42% 77%;
+      30px 30px,
+      30px 30px,
+      50% 60%;            /* glow continues */
+  }
+  75% {
+    background-position:
+      45px 45px,
+      45px 45px,
+      80% 40%;            /* glow moves around */
   }
   100% {
     background-position:
-      25% 32.5%, 47.5% 30%, 67.5% 40%, 57.5% 67.5%, 27.5% 50%, 37.5% 22.5%, 55% 50%,
-      15% 25%, 35% 40%, 60% 20%, 75% 60%, 40% 75%;
+      60px 60px,          /* grid completes full cycle */
+      60px 60px,
+      100% 80%;           /* glow ends at bottom-right */
   }
 }
 
-/* Drift for ambient glows + scan */
-@keyframes driftAmbient {
+/* ---------- Layer 2: horizontal scanning line (element based) ---------- */
+body::after {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(155, 28, 49, 0.08) 20%,
+    rgba(155, 28, 49, 0.15) 50%,
+    rgba(155, 28, 49, 0.08) 80%,
+    transparent
+  );
+  top: -2px;                /* start above viewport */
+  animation: scan 25s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes scan {
   0% {
-    background-position: 30% 40%, 80% 70%, 0 0;
-  }
-  33% {
-    background-position: 32% 42%, 77% 68%, 0 12px;
-  }
-  66% {
-    background-position: 28% 38%, 83% 72%, 0 24px;
+    top: -2px;
   }
   100% {
-    background-position: 30% 40%, 80% 70%, 0 0;
+    top: 100%;
   }
 }
 
-/* ===== MICRO‑INTERACTIONS ===== */
-/* Buttons – soft red glow */
+/* ---------- Subtle micro‑interactions ---------- */
+/* Buttons: soft red glow */
+button,
+.btn,
+.button,
+[role="button"] {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
 button:hover,
 .btn:hover,
-[class*="btn"]:hover {
-  box-shadow: 0 0 12px rgba(155, 28, 49, 0.5);
-  transition: box-shadow 0.2s ease;
+.button:hover,
+[role="button"]:hover {
+  box-shadow: 0 0 12px rgba(155, 28, 49, 0.6);
+  transform: translateY(-1px);
 }
 
-/* Cards – gentle lift */
-.card:hover {
-  transform: translateY(-4px);
-  transition: transform 0.2s ease;
+/* Cards: lift effect */
+.card,
+[class*="card"] {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Navigation links – animated red underline */
-.nav-link,
-nav a {
+.card:hover,
+[class*="card"]:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Navigation links: animated underline */
+nav a,
+.nav a,
+.navbar a,
+.nav-links a {
   position: relative;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.nav-link::after,
-nav a::after {
+nav a::after,
+.nav a::after,
+.navbar a::after,
+.nav-links a::after {
   content: '';
   position: absolute;
   bottom: -2px;
-  left: 50%;
-  width: 0;
-  height: 1px;
-  background-color: #9B1C31;
-  transition: width 0.3s ease, left 0.3s ease;
-}
-
-.nav-link:hover::after,
-nav a:hover::after {
-  width: 100%;
   left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #9B1C31;
+  transition: width 0.25s ease;
 }
 
-/* Base transition for interactive elements */
-button,
-.btn,
-.card,
-.nav-link,
-nav a {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+nav a:hover::after,
+.nav a:hover::after,
+.navbar a:hover::after,
+.nav-links a:hover::after {
+  width: 100%;
 }
+
+/* Ensure no layout changes or active class styles are introduced */
