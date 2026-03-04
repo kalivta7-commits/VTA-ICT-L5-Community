@@ -6,13 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Get form elements
-    const titleInput = form.querySelector('[name="title"]');
-    const subjectSelect = form.querySelector('[name="subject"]');
-    const topicInput = form.querySelector('[name="topic"]');
-    const uploaderInput = form.querySelector('[name="uploader"]');
-    const fileTypeSelect = form.querySelector('[name="file-type"]');
-    const fileInput = form.querySelector('[name="file-upload"]');
+      const titleInput = form.querySelector('[name="title"]');
+      const subjectSelect = form.querySelector('[name="subject"]');
+      const topicInput = form.querySelector('[name="topic"]');
+      const uploaderInput = form.querySelector('[name="uploader"]');
+      const fileTypeSelect = form.querySelector('[name="file-type"]');
+      const fileInput = form.querySelector('[name="file-upload"]');
 
     // Collect values
     const title = titleInput?.value.trim();
@@ -116,3 +115,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+  console.log("Upload JS Loaded");
