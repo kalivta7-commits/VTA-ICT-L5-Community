@@ -90,10 +90,26 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
 
       if (insertError) throw insertError;
-
-      // Success
-      alert('Upload submitted successfully!');
+      // Success message card logic
+      let successCard = document.getElementById('upload-success-card');
+      if (successCard) {
+        successCard.remove();
+      }
+      successCard = document.createElement('div');
+      successCard.id = 'upload-success-card';
+      successCard.className = 'success-card fade-in';
+      successCard.innerHTML = `
+        <div class="success-card-icon">✅</div>
+        <div class="success-card-content">
+          <h3>Upload Successful!</h3>
+          <p>Your note has been submitted for admin review.<br>It will be reviewed within 24 hours.</p>
+        </div>
+      `;
+      form.parentNode.insertBefore(successCard, form);
       form.reset();
+      setTimeout(() => {
+        successCard.remove();
+      }, 5000);
     } catch (err) {
       console.error('Upload error:', err);
       alert('Upload failed. Please try again or check console.');
