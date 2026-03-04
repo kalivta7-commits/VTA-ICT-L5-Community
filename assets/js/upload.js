@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleInput = form.querySelector('[name="title"]');
     const subjectSelect = form.querySelector('[name="subject"]');
     const topicInput = form.querySelector('[name="topic"]');
-    const uploaderInput = form.querySelector('[name="uploader_name"]');
-    const fileTypeSelect = form.querySelector('[name="file_type"]');
-    const fileInput = form.querySelector('[name="file"]');
+    const uploaderInput = form.querySelector('[name="uploader"]');
+    const fileTypeSelect = form.querySelector('[name="file-type"]');
+    const fileInput = form.querySelector('[name="file-upload"]');
 
     // Collect values
     const title = titleInput?.value.trim();
@@ -20,12 +20,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const topic = topicInput?.value.trim();
     const uploader_name = uploaderInput?.value.trim();
     const file_type = fileTypeSelect?.value;
-    const file = fileInput?.files[0];
+    let file = fileInput?.files[0];
 
     // Validation
-    if (!title || !subject || !topic || !uploader_name || !file_type || !file) {
+    if (!title || !subject || !topic || !uploader_name || !file_type || !fileInput?.files.length) {
       alert('Please fill in all required fields and select a file.');
       return;
+    }
+
+    // If file_type is Images (Will convert to PDF), convert all images to a single PDF
+    if (file_type === "images") {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      const files = fileInput.files;
+
+      for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+
+        const imageData = await new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(files[i]);
+        });
+
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imageData, "JPEG", 10, 10, 190, 0);
+      }
+
+      const pdfBlob = pdf.output("blob");
+      file = new File(
+        [pdfBlob],
+        `${Date.now()}-converted.pdf`,
+        { type: "application/pdf" }
+      );
     }
 
     // Prepare file path
