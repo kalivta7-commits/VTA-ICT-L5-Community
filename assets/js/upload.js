@@ -1,4 +1,5 @@
-// assets/js/upload.js
+console.log("Upload JS Loaded");
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('form');
   if (!form) return;
@@ -6,14 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-      const titleInput = form.querySelector('[name="title"]');
-      const subjectSelect = form.querySelector('[name="subject"]');
-      const topicInput = form.querySelector('[name="topic"]');
-      const uploaderInput = form.querySelector('[name="uploader"]');
-      const fileTypeSelect = form.querySelector('[name="file-type"]');
-      const fileInput = form.querySelector('[name="file-upload"]');
+    const titleInput = form.querySelector('[name="title"]');
+    const subjectSelect = form.querySelector('[name="subject"]');
+    const topicInput = form.querySelector('[name="topic"]');
+    const uploaderInput = form.querySelector('[name="uploader"]');
+    const fileTypeSelect = form.querySelector('[name="file-type"]');
+    const fileInput = form.querySelector('[name="file-upload"]');
 
-    // Collect values
     const title = titleInput?.value.trim();
     const subject = subjectSelect?.value;
     const topic = topicInput?.value.trim();
@@ -27,54 +27,50 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // If file_type is Images (Will convert to PDF), convert all images to a single PDF
+    // Check Supabase client
+    const supabase = window.supabaseClient;
+    if (!supabase) {
+      alert('Supabase client not initialized.');
+      return;
+    }
+
+    // Convert images to PDF if needed
     if (file_type === "images") {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
       const files = fileInput.files;
-
       for (let i = 0; i < files.length; i++) {
         const reader = new FileReader();
-
         const imageData = await new Promise((resolve) => {
           reader.onload = () => resolve(reader.result);
           reader.readAsDataURL(files[i]);
         });
-
         if (i > 0) pdf.addPage();
         pdf.addImage(imageData, "JPEG", 10, 10, 190, 0);
       }
-
       const pdfBlob = pdf.output("blob");
-      file = new File(
-        [pdfBlob],
-        `${Date.now()}-converted.pdf`,
-        { type: "application/pdf" }
-      );
+      file = new File([
+        pdfBlob
+      ], `${Date.now()}-converted.pdf`, { type: "application/pdf" });
     }
 
-    // Prepare file path
     const timestamp = Date.now();
     const filePath = `${timestamp}-${file.name}`;
 
     try {
-      // Upload file to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('notes-files')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from('notes-files')
         .getPublicUrl(filePath);
 
       const file_url = urlData.publicUrl;
 
-      // Insert record into notes table
-      const { error: insertError } = await 
-      supabase
+      const { error: insertError } = await supabase
         .from('notes')
         .insert([
           {
@@ -89,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
 
       if (insertError) throw insertError;
+
       // Success message card logic
       let successCard = document.getElementById('upload-success-card');
       if (successCard) {
@@ -115,5 +112,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-  console.log("Upload JS Loaded");
