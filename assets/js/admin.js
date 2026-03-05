@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const supabase = window.supabaseClient;
     if (!supabase) {
         console.error('Supabase client not available');
-        document.getElementById('adminGrid').innerHTML = `<div class="empty-state"><span>❌</span>Failed to connect to database. Please refresh.</div>`;
+        document.getElementById('adminGrid').innerHTML =
+            `<div class="empty-state"><span>❌</span> Failed to connect to database. Please refresh.</div>`;
         return;
     }
 
@@ -33,16 +34,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Fetch all pending notes (approved = false)
+    // Fetch all pending notes using the status column
     async function fetchPendingNotes() {
         const { data, error } = await supabase
             .from('notes')
             .select('*')
-            .eq('approved', false)
+            .eq('status', 'pending')
             .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching notes:', error);
+            adminGrid.innerHTML =
+                `<div class="empty-state"><span>❌</span> Failed to load notes: ${escapeHtml(error.message)}</div>`;
             return [];
         }
         return data || [];
@@ -51,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Render notes as cards
     function renderNotes(notes) {
         if (!notes.length) {
-            adminGrid.innerHTML = `<div class="empty-state">✅ No pending uploads</div>`;
+            adminGrid.innerHTML = `<div class="empty-state">✅ No pending uploads — all clear!</div>`;
             return;
         }
 
@@ -64,16 +67,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h3 class="note-title">${escapeHtml(note.title)}</h3>
           <div class="note-meta">
             <span>📚 ${escapeHtml(note.subject || 'Uncategorized')}</span>
+            <span>📝 ${escapeHtml(note.topic || 'No topic')}</span>
             <span>👤 ${escapeHtml(note.uploader_name || 'Anonymous')}</span>
             <span>📅 ${formatDate(note.created_at)}</span>
           </div>
-          <div style="margin-bottom: 0.5rem;">
+          <div style="margin-bottom: 0.75rem;">
             <span class="file-type-badge ${typeClass}">${fileType}</span>
           </div>
           <div class="admin-actions">
             <a href="${escapeHtml(note.file_url)}" target="_blank" rel="noopener noreferrer" class="btn btn-preview">👁️ Preview</a>
+            <a href="${escapeHtml(note.file_url)}" download target="_blank" rel="noopener noreferrer" class="btn btn-preview">⬇️ Download</a>
             <button class="btn btn-approve approve-btn">✅ Approve</button>
-            <button class="btn btn-delete delete-btn">🗑️ Delete</button>
+            <button class="btn btn-delete delete-btn">🗑️ Reject</button>
           </div>
         </div>
       `;
@@ -81,39 +86,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         adminGrid.innerHTML = cardsHTML;
 
-        // Attach event listeners to buttons
+        // Attach event listeners
         document.querySelectorAll('.approve-btn').forEach(btn => {
             btn.addEventListener('click', handleApprove);
         });
         document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', handleDelete);
+            btn.addEventListener('click', handleReject);
         });
     }
 
-    // Approve button handler
+    // Approve button handler — updates status to 'approved'
     async function handleApprove(e) {
         const card = e.target.closest('.note-card');
         if (!card) return;
         const noteId = card.dataset.id;
 
-        // Disable button to prevent double clicks
         e.target.disabled = true;
-        e.target.textContent = 'Approving...';
+        e.target.textContent = 'Approving…';
 
         try {
             const { error } = await supabase
                 .from('notes')
-                .update({ approved: true })
+                .update({ status: 'approved' })
                 .eq('id', noteId);
 
             if (error) throw error;
 
-            // Remove card from UI
             card.remove();
-
-            // If no cards left, show empty state
             if (adminGrid.children.length === 0) {
-                adminGrid.innerHTML = `<div class="empty-state">✅ No pending uploads</div>`;
+                adminGrid.innerHTML = `<div class="empty-state">✅ No pending uploads — all clear!</div>`;
             }
         } catch (err) {
             console.error('Approve error:', err);
@@ -123,19 +124,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Delete button handler
-    async function handleDelete(e) {
+    // Reject button handler — deletes the note entirely
+    async function handleReject(e) {
         const card = e.target.closest('.note-card');
         if (!card) return;
         const noteId = card.dataset.id;
 
-        if (!confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+        if (!confirm('Are you sure you want to reject and delete this note? This cannot be undone.')) {
             return;
         }
 
-        // Disable button
         e.target.disabled = true;
-        e.target.textContent = 'Deleting...';
+        e.target.textContent = 'Deleting…';
 
         try {
             const { error } = await supabase
@@ -145,23 +145,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (error) throw error;
 
-            // Remove card from UI
             card.remove();
-
-            // If no cards left, show empty state
             if (adminGrid.children.length === 0) {
-                adminGrid.innerHTML = `<div class="empty-state">✅ No pending uploads</div>`;
+                adminGrid.innerHTML = `<div class="empty-state">✅ No pending uploads — all clear!</div>`;
             }
         } catch (err) {
-            console.error('Delete error:', err);
-            alert('Failed to delete note. Please try again.');
+            console.error('Reject error:', err);
+            alert('Failed to reject note. Please try again.');
             e.target.disabled = false;
-            e.target.textContent = '🗑️ Delete';
+            e.target.textContent = '🗑️ Reject';
         }
     }
 
     // Initial load
-    adminGrid.innerHTML = '<div class="loading-indicator">Loading pending notes...</div>';
+    adminGrid.innerHTML = '<div class="loading-indicator">Loading pending notes…</div>';
     const notes = await fetchPendingNotes();
     renderNotes(notes);
 });
