@@ -192,6 +192,34 @@
     </div>
   </footer>
 
+
+  <!-- Upload Overlay -->
+  <div id="uploadOverlay" class="upload-overlay" style="display:none;">
+    <div class="upload-overlay-content">
+      <div class="upload-title">Uploading file...</div>
+      <div class="progress-bar-bg">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div id="progressPercent" class="progress-percent">0%</div>
+    </div>
+  </div>
+
+  <!-- Success Popup -->
+  <div id="successPopup" class="success-card" style="display:none;">
+    <div class="success-card-content">
+      <div class="success-card-icon">
+        <!-- Modern check icon SVG, red accent -->
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="12" fill="#b91c1c"/>
+          <path d="M7 13.5l3 3 6-6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Upload Successful</h3>
+      <p>Your note was submitted.<br>Admin will review and approve it within 24 hours.</p>
+      <button id="closeSuccessBtn" class="success-btn">Got it</button>
+    </div>
+  </div>
+
   <script src="assets/js/ui.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase.js"></script>
