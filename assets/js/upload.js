@@ -1,33 +1,37 @@
-console.log("Upload JS Loaded");
-
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector('form');
+  // UI Helper Functions
+  function showUploadOverlay() {
+    document.getElementById('uploadOverlay').style.display = 'flex';
+    updateUploadProgress(0);
+  }
+  function hideUploadOverlay() {
+    document.getElementById('uploadOverlay').style.display = 'none';
+  }
+  function updateUploadProgress(percent) {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressPercent');
+    progressBar.style.width = percent + '%';
+    progressText.textContent = percent + '%';
+  }
+  function showSuccessPopup() {
+    document.getElementById('successPopup').style.display = 'flex';
+  }
+  function closeSuccessPopup() {
+    document.getElementById('successPopup').style.display = 'none';
+  }
+  // Attach close event
+  document.getElementById('closeSuccessBtn').addEventListener('click', closeSuccessPopup);
+
+  const form = document.getElementById('uploadForm');
   if (!form) return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    // UI: Remove previous error/success/loading
+    // Remove old error messages
     const prevError = document.getElementById('upload-error-message');
     if (prevError) prevError.remove();
-    const prevSuccess = document.getElementById('upload-success-card');
-    if (prevSuccess) prevSuccess.remove();
-    const prevLoading = document.getElementById('upload-loading-indicator');
-    if (prevLoading) prevLoading.remove();
 
-    // UI: Show loading indicator and disable submit button
-    const submitBtn = form.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    const originalBtnText = submitBtn.innerText;
-    submitBtn.innerHTML = 'Uploading <span class="upload-spinner">⏳</span>';
-
-    // Show loading spinner
-    let loadingIndicator = document.createElement('div');
-    loadingIndicator.id = 'upload-loading-indicator';
-    loadingIndicator.className = 'loading-indicator';
-    loadingIndicator.innerHTML = '<span class="upload-spinner">Uploading <span>⏳</span></span>';
-    form.parentNode.insertBefore(loadingIndicator, form);
-
+    // Validation
     const titleInput = form.querySelector('[name="title"]');
     const subjectSelect = form.querySelector('[name="subject"]');
     const topicInput = form.querySelector('[name="topic"]');
@@ -42,12 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const file_type = fileTypeSelect?.value;
     let file = fileInput?.files[0];
 
-    // Validation
     if (!title || !subject || !topic || !uploader_name || !file_type || !fileInput?.files.length) {
-      if (loadingIndicator) loadingIndicator.remove();
-      submitBtn.disabled = false;
-      submitBtn.innerText = originalBtnText;
-      // Show error message
+      // Show error message (modern style)
       const errorMsg = document.createElement('div');
       errorMsg.id = 'upload-error-message';
       errorMsg.className = 'error-message';
@@ -58,10 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check Supabase client
     const supabase = window.supabaseClient;
+
     if (!supabase) {
-      if (loadingIndicator) loadingIndicator.remove();
-      submitBtn.disabled = false;
-      submitBtn.innerText = originalBtnText;
       const errorMsg = document.createElement('div');
       errorMsg.id = 'upload-error-message';
       errorMsg.className = 'error-message';
@@ -70,13 +68,23 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // ...existing code...
+    // Show fullscreen overlay
+    showUploadOverlay();
+
+    // Simulate progress animation to 90%
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      if (progress < 90) {
+        progress += 2;
+        updateUploadProgress(progress);
+      }
+    }, 50);
 
     const timestamp = Date.now();
     const filePath = `${timestamp}-${file.name}`;
 
     try {
-      // ...existing Supabase upload logic...
+      // Supabase upload logic (untouched)
       const { error: uploadError } = await supabase.storage
         .from('notes-files')
         .upload(filePath, file);
@@ -105,45 +113,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (insertError) throw insertError;
 
-      // Remove loading indicator and restore button
-      if (loadingIndicator) loadingIndicator.remove();
-      submitBtn.disabled = false;
-      submitBtn.innerText = originalBtnText;
+      clearInterval(progressInterval);
+      updateUploadProgress(100);
 
-      // Success card logic
-      const successCard = document.createElement('div');
-      successCard.id = 'upload-success-card';
-      successCard.className = 'success-card fade-in';
-      successCard.innerHTML = `
-        <div class="success-card-icon">✅</div>
-        <div class="success-card-content">
-          <h3>Upload Successful</h3>
-          <p>Your note has been submitted. Admin will review within 24 hours.</p>
-        </div>
-        <button class="success-card-close" aria-label="Close">&times;</button>
-      `;
-      form.parentNode.insertBefore(successCard, form);
-      // Close button logic
-      const closeBtn = successCard.querySelector('.success-card-close');
-      closeBtn.addEventListener('click', () => {
-        successCard.remove();
-      });
-      // Auto-hide after 5s
       setTimeout(() => {
-        if (document.getElementById('upload-success-card')) {
-          successCard.remove();
-        }
-      }, 5000);
-      form.reset();
-      submitBtn.disabled = false;
-      submitBtn.innerText = originalBtnText;
-    } catch (err) {
-      // Remove loading indicator and restore button
-      if (loadingIndicator) loadingIndicator.remove();
-      submitBtn.disabled = false;
-      submitBtn.innerText = originalBtnText;
+        hideUploadOverlay();
+        showSuccessPopup();
+        form.reset();
+      }, 500);
 
-      // Show error message above form
+    } catch (err) {
+      clearInterval(progressInterval);
+      hideUploadOverlay();
+      // Show error message (modern style)
       const errorMsg = document.createElement('div');
       errorMsg.id = 'upload-error-message';
       errorMsg.className = 'error-message';
@@ -153,3 +135,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
