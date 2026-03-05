@@ -1,40 +1,166 @@
-/* Success Card Styles for Upload */
-.success-card {
+/* Upload Overlay */
+.upload-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(20, 20, 30, 0.85);
+  z-index: 9999;
   display: flex;
-  align-items: flex-start;
-  background: #e6f9ed;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.12);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
-  border-left: 5px solid #22c55e;
-  animation: fadeInSuccess 0.6s;
+  align-items: center;
+  justify-content: center;
   transition: opacity 0.3s;
 }
+.upload-overlay-content {
+  text-align: center;
+  color: #fff;
+  width: 90vw;
+  max-width: 350px;
+}
+.upload-title {
+  font-size: 1.3rem;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+.progress-bar-bg {
+  width: 100%;
+  height: 16px;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: 0 0 8px #222;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  box-shadow: 0 0 12px #00c6ff;
+  transition: width 0.3s;
+  border-radius: 8px;
+  animation: glow 1.5s infinite alternate;
+}
+@keyframes glow {
+  from { box-shadow: 0 0 12px #00c6ff; }
+  to { box-shadow: 0 0 24px #0072ff; }
+}
+.progress-percent {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* ===== SUCCESS CARD — centered dark notification card ===== */
+.success-card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  /* semi-transparent backdrop so page is still visible */
+  background: rgba(10, 12, 16, 0.72);
+  backdrop-filter: blur(4px);
+  animation: scFadeBackdrop 0.35s ease forwards;
+}
+/* Success Card — inner panel */
+.success-card-content {
+  background: #161a22;
+  border-radius: 20px;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.07);
+  padding: 2.5rem 2rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  animation: scSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 .success-card-icon {
-  font-size: 2rem;
-  margin-right: 1rem;
+  font-size: 2.6rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #22c55e;
-  flex-shrink: 0;
 }
+
 .success-card-content h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.15rem;
-  color: #15803d;
-  font-weight: 600;
+  margin: 0 0 0.4rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #f0f4f8;
+  letter-spacing: 0.01em;
 }
+
 .success-card-content p {
-  margin: 0;
-  color: #166534;
-  font-size: 1rem;
+  margin: 0 0 1.5rem;
+  color: #a0a8b4;
+  font-size: 0.97rem;
+  line-height: 1.6;
+  max-width: 320px;
 }
+
+.success-btn {
+  display: inline-block;
+  padding: 0.72em 2.4em;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #9B1C31, #b22b40);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(155, 28, 49, 0.38);
+  transition: background 0.22s ease, transform 0.18s ease, box-shadow 0.22s ease;
+}
+
+.success-btn:hover,
+.success-btn:focus {
+  background: linear-gradient(135deg, #b22b40, #c0394e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(155, 28, 49, 0.50);
+  outline: none;
+}
+
+/* Responsive — mobile */
+@media (max-width: 600px) {
+  .success-card-content {
+    max-width: 92vw;
+    padding: 2rem 1.25rem 1.6rem;
+  }
+  .success-card-content h3 {
+    font-size: 1.15rem;
+  }
+  .success-card-content p {
+    font-size: 0.93rem;
+  }
+  .success-btn {
+    width: 100%;
+    font-size: 0.97rem;
+  }
+}
+
+/* Fade-in utility (kept for JS compat) */
 .fade-in {
   opacity: 0;
-  animation: fadeInSuccess 0.6s forwards;
+  animation: scSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
-@keyframes fadeInSuccess {
-  from { opacity: 0; transform: translateY(-10px);}
-  to { opacity: 1; transform: translateY(0);}
+
+@keyframes scFadeBackdrop {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scSlideUp {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
 }
 /* ===== RESET & BASE ===== */
 * {
@@ -227,43 +353,6 @@ html {
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}/* Success Card Styles for Upload */
-.success-card {
-  display: flex;
-  align-items: flex-start;
-  background: #e6f9ed;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.12);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
-  border-left: 5px solid #22c55e;
-  animation: fadeInSuccess 0.6s;
-  transition: opacity 0.3s;
-}
-.success-card-icon {
-  font-size: 2rem;
-  margin-right: 1rem;
-  color: #22c55e;
-  flex-shrink: 0;
-}
-.success-card-content h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.15rem;
-  color: #15803d;
-  font-weight: 600;
-}
-.success-card-content p {
-  margin: 0;
-  color: #166534;
-  font-size: 1rem;
-}
-.fade-in {
-  opacity: 0;
-  animation: fadeInSuccess 0.6s forwards;
-}
-@keyframes fadeInSuccess {
-  from { opacity: 0; transform: translateY(-10px);}
-  to { opacity: 1; transform: translateY(0);}
 }
 /* ===== RESET & BASE ===== */
 * {
@@ -684,3 +773,4 @@ input:focus, textarea:focus {
     box-shadow: 0 0 20px rgba(155, 28, 49, 0.6);
     transform: translateY(-2px);
 }
+
