@@ -162,3 +162,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     const notes = await fetchPendingNotes();
     renderNotes(notes);
 });
+
