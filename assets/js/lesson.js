@@ -113,9 +113,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         notesGrid.innerHTML = '<div class="loading-indicator">Loading notes...</div>';
 
         const { data, error } = await supabase
-            .from('notes')
-            .select('title, subject, uploader_name, file_type, file_url')
-            .eq('status', 'approved');
+        .from('notes')
+        .select('*')
+        .eq('status','approved')
+        .order('created_at', { ascending: 
+        false });
 
         if (error) {
             console.error('Error fetching notes:', error);
