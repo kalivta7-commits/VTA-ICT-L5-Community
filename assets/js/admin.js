@@ -34,12 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Fetch all pending notes using the status column
+    // Fetch all pending notes (approved = false)
     async function fetchPendingNotes() {
         const { data, error } = await supabase
             .from('notes')
             .select('*')
-            .eq('status', 'pending')
+            .eq('approved', false)
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Approve button handler — updates status to 'approved'
+    // Approve button handler — sets approved = true in the database
     async function handleApprove(e) {
         const card = e.target.closest('.note-card');
         if (!card) return;
@@ -107,15 +107,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const { error } = await supabase
                 .from('notes')
-                .update({ status: 'approved' })
+                .update({ approved: true })
                 .eq('id', noteId);
 
             if (error) throw error;
 
-            card.remove();
-            if (adminGrid.children.length === 0) {
-                adminGrid.innerHTML = `<div class="empty-state">✅ No pending uploads — all clear!</div>`;
-            }
+            alert('Note approved!');
+            location.reload();
         } catch (err) {
             console.error('Approve error:', err);
             alert('Failed to approve note. Please try again.');
