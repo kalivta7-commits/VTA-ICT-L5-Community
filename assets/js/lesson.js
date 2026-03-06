@@ -162,4 +162,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initialize
     await loadNotes();
+
+    // Auto-activate filter from URL ?topic= param
+    const urlParams = new URLSearchParams(window.location.search);
+    const topicParam = urlParams.get('topic');
+    if (topicParam) {
+        const matchingPill = [...filterPills].find(
+            p => p.dataset.subject.toLowerCase() === topicParam.toLowerCase()
+        );
+        if (matchingPill) {
+            matchingPill.click();
+        }
+    }
 });
