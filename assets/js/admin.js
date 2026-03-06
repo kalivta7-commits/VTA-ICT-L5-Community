@@ -155,9 +155,132 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Initial load
+    // Initial load — Notes
     adminGrid.innerHTML = '<div class="loading-indicator">Loading pending notes…</div>';
     const notes = await fetchPendingNotes();
     renderNotes(notes);
+
+    // ── Community Posts Moderation ──────────────────────────────────────────
+
+    const postsGrid = document.getElementById('postsGrid');
+
+    // Fetch pending community posts
+    async function fetchPendingPosts() {
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching posts:', error);
+            postsGrid.innerHTML =
+                `<div class="empty-state"><span>❌</span> Failed to load posts: ${escapeHtml(error.message)}</div>`;
+            return [];
+        }
+        return data || [];
+    }
+
+    // Render community post cards
+    function renderPosts(posts) {
+        if (!posts.length) {
+            postsGrid.innerHTML = `<div class="empty-state">✅ No pending community posts — all clear!</div>`;
+            return;
+        }
+
+        postsGrid.innerHTML = posts.map(post => `
+            <div class="card note-card" data-post-id="${post.id}">
+                ${post.image_url
+                ? `<img src="${escapeHtml(post.image_url)}" alt="Post image" class="post-image" loading="lazy">`
+                : `<div class="empty-state" style="padding:1rem;font-size:0.9rem;">🖼️ No image</div>`
+            }
+                <p class="post-caption">${escapeHtml(post.caption || 'No caption provided.')}</p>
+                <div class="note-meta">
+                    <span>👤 ${escapeHtml(post.author || 'Anonymous')}</span>
+                    <span>📅 ${formatDate(post.created_at)}</span>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn btn-approve approve-post-btn" data-post-id="${post.id}">✅ Approve</button>
+                    <button class="btn btn-delete delete-post-btn" data-post-id="${post.id}">🗑️ Reject</button>
+                </div>
+            </div>
+        `).join('');
+
+        // Attach approve listeners
+        postsGrid.querySelectorAll('.approve-post-btn').forEach(btn => {
+            btn.addEventListener('click', handleApprovePost);
+        });
+
+        // Attach reject listeners
+        postsGrid.querySelectorAll('.delete-post-btn').forEach(btn => {
+            btn.addEventListener('click', handleRejectPost);
+        });
+    }
+
+    // Approve a community post
+    async function handleApprovePost(e) {
+        const btn = e.target.closest('.approve-post-btn');
+        if (!btn) return;
+        const postId = btn.dataset.postId;
+        const card = postsGrid.querySelector(`[data-post-id="${postId}"]`);
+
+        btn.disabled = true;
+        btn.textContent = 'Approving…';
+
+        try {
+            const { error } = await supabase
+                .from('posts')
+                .update({ status: 'approved' })
+                .eq('id', postId);
+
+            if (error) throw error;
+
+            card.remove();
+            if (postsGrid.children.length === 0) {
+                postsGrid.innerHTML = `<div class="empty-state">✅ No pending community posts — all clear!</div>`;
+            }
+        } catch (err) {
+            console.error('Approve post error:', err);
+            alert('Failed to approve post. Please try again.');
+            btn.disabled = false;
+            btn.textContent = '✅ Approve';
+        }
+    }
+
+    // Reject (delete) a community post
+    async function handleRejectPost(e) {
+        const btn = e.target.closest('.delete-post-btn');
+        if (!btn) return;
+        const postId = btn.dataset.postId;
+        const card = postsGrid.querySelector(`[data-post-id="${postId}"]`);
+
+        if (!confirm('Are you sure you want to reject and delete this post? This cannot be undone.')) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Deleting…';
+
+        try {
+            const { error } = await supabase
+                .from('posts')
+                .delete()
+                .eq('id', postId);
+
+            if (error) throw error;
+
+            card.remove();
+            if (postsGrid.children.length === 0) {
+                postsGrid.innerHTML = `<div class="empty-state">✅ No pending community posts — all clear!</div>`;
+            }
+        } catch (err) {
+            console.error('Reject post error:', err);
+            alert('Failed to reject post. Please try again.');
+            btn.disabled = false;
+            btn.textContent = '🗑️ Reject';
+        }
+    }
+
+    // Initial load — Posts
+    const posts = await fetchPendingPosts();
+    renderPosts(posts);
 });
 
