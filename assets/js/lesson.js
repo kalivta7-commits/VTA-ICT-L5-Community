@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <!-- Row 2: Subject pill -->
           <span class="note-subject">${escapeHtml(note.subject || 'Uncategorized')}</span>
+          <span class="note-topic">${escapeHtml(note.topic || '')}</span>
           <!-- Row 3: Uploader + Date -->
           <div class="note-meta">
             <span>👤 ${escapeHtml(note.uploader_name || note.uploader || 'Anonymous')}</span>
@@ -175,4 +176,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
-
