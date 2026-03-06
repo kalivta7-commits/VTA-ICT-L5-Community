@@ -34,12 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Fetch all pending notes (approved = false)
+    // Fetch all pending notes (status = 'pending')
     async function fetchPendingNotes() {
         const { data, error } = await supabase
             .from('notes')
             .select('*')
-            .eq('approved', false)
+            .eq('status', 'pending')
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="admin-actions">
             <a href="${escapeHtml(note.file_url)}" target="_blank" rel="noopener noreferrer" class="btn btn-preview">👁️ Preview</a>
             <a href="${escapeHtml(note.file_url)}" download target="_blank" rel="noopener noreferrer" class="btn btn-preview">⬇️ Download</a>
-            <button class="btn btn-approve approve-btn">✅ Approve</button>
+            <button class="btn btn-approve approve-btn" data-note-id="${note.id}">✅ Approve</button>
             <button class="btn btn-delete delete-btn">🗑️ Reject</button>
           </div>
         </div>
@@ -95,19 +95,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Approve button handler — sets approved = true in the database
+    // Approve button handler — sets status = 'approved' in the database
     async function handleApprove(e) {
-        const card = e.target.closest('.note-card');
-        if (!card) return;
-        const noteId = card.dataset.id;
+        const btn = e.target.closest('.approve-btn');
+        if (!btn) return;
+        const noteId = btn.dataset.noteId;
 
-        e.target.disabled = true;
-        e.target.textContent = 'Approving…';
+        btn.disabled = true;
+        btn.textContent = 'Approving…';
 
         try {
             const { error } = await supabase
                 .from('notes')
-                .update({ approved: true })
+                .update({ status: 'approved' })
                 .eq('id', noteId);
 
             if (error) throw error;
@@ -117,8 +117,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (err) {
             console.error('Approve error:', err);
             alert('Failed to approve note. Please try again.');
-            e.target.disabled = false;
-            e.target.textContent = '✅ Approve';
+            btn.disabled = false;
+            btn.textContent = '✅ Approve';
         }
     }
 
