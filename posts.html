@@ -3,18 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create post · VTA ICT L5 Community</title>
-  <!-- same CSS stack as index.html -->
+  <title>Community Feed · VTA ICT L5</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
   <link rel="stylesheet" href="assets/css/animations.css">
-  <!-- Supabase JS (v2) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- local supabase initializer – must define global supabase client -->
-  <script src="assets/js/supabase.js"></script>
+  <!-- Community page specific styles -->
+  <link rel="stylesheet" href="assets/css/community.css">
 </head>
 <body>
-  <!-- ========== NAVBAR (identical to index.html) ========== -->
+  <!-- Navbar (exactly as index.html) -->
   <nav class="navbar">
     <div class="container">
       <div class="logo">VTA ICT L5 Community</div>
@@ -23,7 +20,7 @@
         <ul class="nav-links">
           <li><a href="index.html">Home</a></li>
           <li><a href="lesson.html">Lessons</a></li>
-          <li><a href="posts.html">Community</a></li>
+          <li><a href="posts.html" style="color: var(--primary-color);">Community</a></li>
         </ul>
         <div class="nav-buttons">
           <a href="upload.html" class="btn btn-outline">Add Notes</a>
@@ -34,207 +31,29 @@
   </nav>
 
   <main>
-    <!-- centered card form for community post -->
-    <section class="section">
-      <div class="container">
-        <div class="card" style="max-width: 620px; margin-left: auto; margin-right: auto; padding: 2rem 2rem 2.5rem;">
-          <h2 style="margin-bottom: 1.75rem; color: var(--primary-color); font-size: 1.9rem; font-weight: 600; text-align: center;">📝 share with community</h2>
-          <p style="text-align: center; margin-bottom: 2rem; color: var(--text-secondary);">your post will be visible after admin approval</p>
-
-          <form id="postForm">
-            <!-- author (name) -->
-            <div style="margin-bottom: 1.5rem;">
-              <label for="author" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Your name</label>
-              <input type="text" id="author" name="author" placeholder="e.g. Kimathi M." required>
-            </div>
-
-            <!-- caption -->
-            <div style="margin-bottom: 1.5rem;">
-              <label for="caption" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Caption / description</label>
-              <textarea id="caption" name="caption" rows="4" placeholder="What's your post about? (project tip, question, resource...)" required></textarea>
-            </div>
-
-            <!-- image file -->
-            <div style="margin-bottom: 2rem;">
-              <label for="imageFile" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Upload image</label>
-              <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
-              <small style="color: var(--text-secondary); display: block; margin-top: 0.4rem;">accepted: jpg, png, gif, webp (max 5MB)</small>
-            </div>
-
-            <!-- submit button -->
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1.1rem; font-weight: 600;">✍️ submit for approval</button>
-          </form>
-
-          <!-- dynamic message area (success/error) -->
-          <div id="form-message" style="margin-top: 1.8rem;"></div>
-        </div>
+    <div class="container feed-container">
+      <!-- Feed will be injected here by JavaScript -->
+      <div id="community-feed" class="community-feed">
+        <div class="loading-indicator">Loading posts...</div>
       </div>
-    </section>
+    </div>
+
+    <!-- Floating create button → opens community-upload.html -->
+    <a href="community-upload.html" class="floating-create-btn" aria-label="Create new post">+</a>
   </main>
 
-  <!-- ========== FOOTER ========== -->
+  <!-- Footer (same as index) -->
   <footer class="footer">
     <div class="container">
       <p>© 2025 VTA ICT L5 Community. All rights reserved.</p>
-      <p>VTA ICT Level 5 Community — academic excellence through collaboration.</p>
+      <p>VTA ICT Level 5 Community — Academic excellence through collaboration.</p>
     </div>
   </footer>
 
-  <!-- theme & mobile menu (same ui.js) -->
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase.js"></script>
   <script src="assets/js/ui.js"></script>
-
-  <!-- custom script for community upload logic -->
-  <script>
-    (function() {
-      // Wait for DOM and ensure supabase is ready (from supabase.js)
-      document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('postForm');
-        const messageDiv = document.getElementById('form-message');
-
-        // make sure supabase client exists (global variable from supabase.js)
-        if (typeof supabase === 'undefined') {
-          messageDiv.innerHTML = '<div class="error" style="color: #f87171; background: rgba(239,68,68,0.1); padding: 1rem; border-radius: 8px;">⚠️ Supabase client not loaded. Check assets/js/supabase.js</div>';
-          return;
-        }
-
-        form.addEventListener('submit', async function(e) {
-          e.preventDefault();
-
-          // disable button to avoid double submit
-          const submitBtn = form.querySelector('button[type="submit"]');
-          const originalText = submitBtn.innerText;
-          submitBtn.disabled = true;
-          submitBtn.innerText = 'uploading...';
-
-          // clear previous messages
-          messageDiv.innerHTML = '';
-
-          // collect form values
-          const author = document.getElementById('author').value.trim();
-          const caption = document.getElementById('caption').value.trim();
-          const fileInput = document.getElementById('imageFile');
-          const file = fileInput.files[0];
-
-          // basic validation
-          if (!author || !caption || !file) {
-            showMessage('All fields are required, including an image.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalText;
-            return;
-          }
-
-          // optional: file size check (max 5MB)
-          if (file.size > 5 * 1024 * 1024) {
-            showMessage('Image too large. Maximum size is 5MB.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalText;
-            return;
-          }
-
-          try {
-            // ----- 1. upload image to supabase storage (bucket: community-images) -----
-            const fileExt = file.name.split('.').pop();
-            const uniqueFileName = `public/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-            
-            // upload file
-            const { data: uploadData, error: uploadError } = await supabase.storage
-              .from('community-images')
-              .upload(uniqueFileName, file, {
-                cacheControl: '3600',
-                upsert: false
-              });
-
-            if (uploadError) {
-              console.error('upload error:', uploadError);
-              // if bucket missing / permission denied
-              let errorMsg = uploadError.message;
-              if (uploadError.message.includes('bucket')) {
-                errorMsg = 'Storage bucket "community-images" not found or not accessible.';
-              }
-              throw new Error(`Image upload failed: ${errorMsg}`);
-            }
-
-            // ----- 2. get public url of uploaded image -----
-            const { data: urlData } = supabase.storage
-              .from('community-images')
-              .getPublicUrl(uniqueFileName);
-
-            const imageUrl = urlData.publicUrl;  // public URL ready to use
-
-            // ----- 3. insert row into posts table (status = 'pending') -----
-            const { data: insertData, error: insertError } = await supabase
-              .from('posts')
-              .insert([
-                {
-                  author: author,
-                  caption: caption,
-                  image_url: imageUrl,
-                  likes: 0,
-                  status: 'pending'
-                }
-              ]);
-
-            if (insertError) {
-              console.error('insert error:', insertError);
-              throw new Error(`Database insert failed: ${insertError.message}`);
-            }
-
-            // ----- success – show nice overlay / message -----
-            showSuccessCard('Post submitted successfully. Waiting for admin approval.');
-
-            // optionally reset form
-            form.reset();
-
-          } catch (err) {
-            console.error(err);
-            showMessage(err.message || 'Something went wrong. Please try again.', 'error');
-          } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalText;
-          }
-        });
-
-        // helper: show coloured message inside card
-        function showMessage(text, type = 'info') {
-          messageDiv.innerHTML = `<div style="padding: 1rem; border-radius: 8px; background: ${type === 'error' ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)'}; color: ${type === 'error' ? '#fca5a5' : '#4ade80'}; border: 1px solid ${type === 'error' ? '#b91c1c' : '#16a34a'};">${text}</div>`;
-        }
-
-        // success card using the exact styles from style.css (.success-card)
-        function showSuccessCard(messageText) {
-          // remove any existing success overlay
-          const existing = document.querySelector('.success-card');
-          if (existing) existing.remove();
-
-          // create overlay
-          const overlay = document.createElement('div');
-          overlay.className = 'success-card';
-          overlay.setAttribute('role', 'dialog');
-          overlay.innerHTML = `
-            <div class="success-card-content">
-              <div class="success-card-icon">✅</div>
-              <h3>post received</h3>
-              <p>${messageText}</p>
-              <button class="success-btn" id="closeSuccessBtn">continue</button>
-            </div>
-          `;
-
-          document.body.appendChild(overlay);
-
-          // add click handler to close
-          const closeBtn = overlay.querySelector('#closeSuccessBtn');
-          closeBtn.addEventListener('click', () => {
-            overlay.remove();
-          });
-
-          // optional: click outside to close
-          overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) overlay.remove();
-          });
-        }
-      });
-    })();
-  </script>
-
-  <!-- ensure any missing css variables / styles are covered (style.css already includes .success-card) -->
+  <script src="assets/js/community.js"></script>
 </body>
 </html>
