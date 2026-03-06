@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (searchTerm) {
                 const titleMatch = note.title?.toLowerCase().includes(searchTerm);
                 const subjectMatch = note.subject?.toLowerCase().includes(searchTerm);
-                const uploaderMatch = note.uploader_name?.toLowerCase().includes(searchTerm);
+                const uploaderMatch = (note.uploader_name || note.uploader)?.toLowerCase().includes(searchTerm);
                 return titleMatch || subjectMatch || uploaderMatch;
             }
             return true;
