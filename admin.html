@@ -113,6 +113,29 @@
       padding: 2rem;
       color: var(--text-secondary);
     }
+
+    /* Community post card styles */
+    .post-image {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .post-caption {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-color);
+      margin: 2rem 0;
+    }
   </style>
 </head>
 
@@ -139,12 +162,24 @@
   </nav>
 
   <main>
+    <!-- Notes Approvals Section -->
     <section class="section">
       <div class="container">
         <h1 class="admin-title">📋 Pending Note Approvals</h1>
         <div id="adminGrid" class="grid">
           <!-- Cards will be injected by JavaScript -->
           <div class="loading-indicator">Loading pending notes...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Posts Moderation Section -->
+    <section class="section">
+      <div class="container">
+        <hr class="section-divider">
+        <h2 class="admin-title">📸 Pending Community Posts</h2>
+        <div id="postsGrid" class="grid">
+          <div class="loading-indicator">Loading pending posts...</div>
         </div>
       </div>
     </section>
