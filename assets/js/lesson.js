@@ -25,21 +25,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const cardsHTML = filteredNotes.map(note => {
-            const fileType = note.file_type === 'pdf' ? 'PDF' : 'Code';
-            const typeClass = note.file_type === 'pdf' ? 'pdf' : 'code';
+            // Detect file type icon from file_url extension
+            const url = (note.file_url || '').toLowerCase();
+            const codeExts = ['.js', '.java', '.py', '.cpp', '.c', '.html', '.css', '.ts', '.php', '.rb', '.go', '.cs'];
+            const isCode = codeExts.some(ext => url.endsWith(ext));
+            const fileIcon = url.endsWith('.pdf') ? '📄' : isCode ? '💻' : '📁';
+
+            // Format upload date from created_at
+            const date = note.created_at
+                ? new Date(note.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                : 'Unknown date';
 
             return `
         <div class="note-card">
-          <h3 class="note-title">${escapeHtml(note.title)}</h3>
-          <span class="note-subject">${escapeHtml(note.subject)}</span>
-          <div class="note-meta">
-            <span class="uploader-icon">👤</span> ${escapeHtml(note.uploader_name || 'Anonymous')}
-            <span class="file-type-badge ${typeClass}">${fileType}</span>
+          <!-- Row 1: File icon + Title -->
+          <div class="note-card-header">
+            <span class="note-file-icon">${fileIcon}</span>
+            <h3 class="note-title">${escapeHtml(note.title)}</h3>
           </div>
+          <!-- Row 2: Subject pill -->
+          <span class="note-subject">${escapeHtml(note.subject || 'Uncategorized')}</span>
+          <!-- Row 3: Uploader + Date -->
+          <div class="note-meta">
+            <span>👤 ${escapeHtml(note.uploader_name || note.uploader || 'Anonymous')}</span>
+            <span>📅 ${date}</span>
+          </div>
+          <!-- Row 4: Buttons -->
           <div class="note-footer">
-            <a href="${escapeHtml(note.file_url)}" target="_blank" class="download-btn" rel="noopener noreferrer">
-              ⬇️ Download
-            </a>
+            <a href="${escapeHtml(note.file_url)}" target="_blank" rel="noopener noreferrer" class="preview-btn">👁️ Preview</a>
+            <a href="${escapeHtml(note.file_url)}" download target="_blank" rel="noopener noreferrer" class="download-btn">📥 Download</a>
           </div>
         </div>
       `;
@@ -113,11 +127,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         notesGrid.innerHTML = '<div class="loading-indicator">Loading notes...</div>';
 
         const { data, error } = await supabase
-        .from('notes')
-        .select('*')
-        .eq('status','approved')
-        .order('created_at', { ascending: 
-        false });
+            .from('notes')
+            .select('*')
+            .eq('status', 'approved')
+            .order('created_at', {
+                ascending:
+                    false
+            });
 
         if (error) {
             console.error('Error fetching notes:', error);
