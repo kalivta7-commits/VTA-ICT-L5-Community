@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', async () => {
     // Get Supabase client from window (attached by supabase.js)
     const supabase = window.supabaseClient;
@@ -168,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Fetch pending community posts
     async function fetchPendingPosts() {
         const { data, error } = await supabase
-            .from('public_posts')
+            .from('posts')
             .select('*')
             .eq('status', 'pending')
             .order('created_at', { ascending: false });
@@ -230,7 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const { error } = await supabase
-                .from('public_posts')
+                .from('posts')
                 .update({ status: 'approved' })
                 .eq('id', postId);
 
@@ -262,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const { error } = await supabase
-                .from('public_posts')
+                .from('posts')
                 .delete()
                 .eq('id', postId);
 
@@ -284,3 +283,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     const posts = await fetchPendingPosts();
     renderPosts(posts);
 });
+
+
