@@ -177,108 +177,129 @@
     margin-top: 1.5rem;
 }
 
-/* Note card */
+/* Note card — dark glass redesign */
 .note-card {
-    background: var(--card-color);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 1.5rem;
+    background: rgba(15, 15, 20, 0.85);
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    border-radius: 18px;
+    padding: 1.4rem 1.5rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.06),
+        0 4px 24px rgba(0, 0, 0, 0.45);
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    gap: 0.85rem;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
 .note-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
-    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.38),
+        0 8px 32px rgba(0, 0, 0, 0.55);
+}
+
+/* Row 1 — file icon + title */
+.note-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.note-file-icon {
+    font-size: 1.65rem;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .note-title {
-    font-size: 1.3rem;
+    font-size: 1.05rem;
     font-weight: 600;
-    margin-bottom: 0.75rem;
-    color: var(--text-color);
-    line-height: 1.3;
+    color: #f1f1f1;
+    margin: 0;
+    line-height: 1.35;
 }
 
+/* Row 2 — subject pill */
 .note-subject {
     display: inline-block;
-    background: rgba(155, 28, 49, 0.15);
-    color: var(--primary-color);
-    font-size: 0.8rem;
+    padding: 0.25rem 0.8rem;
+    border: 1px solid rgba(220, 38, 38, 0.5);
+    border-radius: 999px;
+    background: rgba(220, 38, 38, 0.08);
+    font-size: 0.78rem;
     font-weight: 600;
-    padding: 0.25rem 1rem;
-    border-radius: 30px;
-    margin-bottom: 1rem;
+    color: #f87171;
+    letter-spacing: 0.03em;
     align-self: flex-start;
-    border: 1px solid rgba(155, 28, 49, 0.3);
 }
 
+/* Row 3 — meta (uploader + date) */
 .note-meta {
     display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.1rem;
+    font-size: 0.84rem;
+    color: rgba(180, 180, 200, 0.75);
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
+    margin-bottom: 0;
 }
 
-.uploader-icon {
-    font-size: 1.1rem;
-}
-
-.file-type-badge {
-    background: var(--border-color);
-    padding: 0.2rem 0.8rem;
-    border-radius: 40px;
-    font-weight: 500;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    border: 1px solid transparent;
-}
-
-.file-type-badge.pdf {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border-color: rgba(239, 68, 68, 0.3);
-}
-
-.file-type-badge.code {
-    background: rgba(59, 130, 246, 0.15);
-    color: #60a5fa;
-    border-color: rgba(59, 130, 246, 0.3);
-}
-
-.note-footer {
+.note-meta span {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
-}
-
-.download-btn {
-    background: transparent;
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-    padding: 0.5rem 1.2rem;
-    border-radius: 40px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-flex;
     align-items: center;
     gap: 0.3rem;
 }
 
+/* Row 4 — action buttons */
+.note-footer {
+    display: flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 0.4rem;
+}
+
+.download-btn {
+    padding: 0.42rem 1.05rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: box-shadow 0.18s ease, background 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.6);
+    color: #f87171;
+}
+
 .download-btn:hover {
-    background: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 12px rgba(155, 28, 49, 0.4);
+    background: rgba(220, 38, 38, 0.22);
+    box-shadow: 0 0 14px rgba(220, 38, 38, 0.35);
+}
+
+.preview-btn {
+    padding: 0.42rem 1.05rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: box-shadow 0.18s ease, background 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #d1d5db;
+}
+
+.preview-btn:hover {
+    background: rgba(255, 255, 255, 0.11);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.07);
 }
 
 /* Empty state */
